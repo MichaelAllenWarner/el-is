@@ -19,7 +19,7 @@ npm install @michaelallenwarner/el-is
 ## Usage
 
 ```ts
-import { elIs } from 'el-is';
+import { elIs } from '@michaelallenwarner/el-is';
 
 const htmlElement = document.querySelector('section'); // `HTMLElement | null`
 if (htmlElement && elIs(htmlElement, 'SECTION')) {
@@ -87,32 +87,3 @@ A few more notes:
 #### Returns
 
 `el` is `E` & { `tagName`: `T` }
-
-<!-- markdownlint-disable-next-line MD053 -->
-[build-img]:https://github.com/MichaelAllenWarner/el-is/actions/workflows/release.yml/badge.svg
-<!-- markdownlint-disable-next-line MD053 -->
-[build-url]:https://github.com/MichaelAllenWarner/el-is/actions/workflows/release.yml
-<!-- markdownlint-disable-next-line MD053 -->
-[downloads-img]:https://img.shields.io/npm/dt/typescript-npm-package-template
-<!-- markdownlint-disable-next-line MD053 -->
-[downloads-url]:https://www.npmtrends.com/typescript-npm-package-template
-<!-- markdownlint-disable-next-line MD053 -->
-[npm-img]:https://img.shields.io/npm/v/typescript-npm-package-template
-<!-- markdownlint-disable-next-line MD053 -->
-[npm-url]:https://www.npmjs.com/package/typescript-npm-package-template
-<!-- markdownlint-disable-next-line MD053 -->
-[issues-img]:https://img.shields.io/github/issues/MichaelAllenWarner/el-is
-<!-- markdownlint-disable-next-line MD053 -->
-[issues-url]:https://github.com/MichaelAllenWarner/el-is/issues
-<!-- markdownlint-disable-next-line MD053 -->
-[codecov-img]:https://codecov.io/gh/MichaelAllenWarner/el-is/branch/main/graph/badge.svg
-<!-- markdownlint-disable-next-line MD053 -->
-[codecov-url]:https://codecov.io/gh/MichaelAllenWarner/el-is
-<!-- markdownlint-disable-next-line MD053 -->
-[semantic-release-img]:https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg
-<!-- markdownlint-disable-next-line MD053 -->
-[semantic-release-url]:https://github.com/semantic-release/semantic-release
-<!-- markdownlint-disable-next-line MD053 -->
-[commitizen-img]:https://img.shields.io/badge/commitizen-friendly-brightgreen.svg
-<!-- markdownlint-disable-next-line MD053 -->
-[commitizen-url]:http://commitizen.github.io/cz-cli/
