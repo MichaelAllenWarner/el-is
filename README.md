@@ -4,7 +4,6 @@
   - [Install](#install)
   - [Usage](#usage)
   - [Usage Notes](#usage-notes)
-    - [Why?](#why)
   - [API](#api)
     - [elIs](#elis)
       - [Type parameters](#type-parameters)
@@ -32,34 +31,38 @@ if (mathMlElement && elIs(mathMlElement, 'mrow')) {
   // `mathMlElement` now has type `MathMLElement & { tagName: 'mrow' }`
 }
 
-const svgElement = document.querySelector('path'); // `SVGElement | null`
-if (svgElement && elIs(svgElement, 'path')) {
-  // `svgElement` now has type `SVGElement & { tagName: 'path' }`
-}
+const element = document.querySelector('.svg-path-element'); // `Element | null`
+if (element && elIs(element, 'path')) {
+  // `element` now has type `Element & { tagName: 'path' }`
+  /*
+    But probably just do `if (element instanceof SVGPathElement)` instead!
 
-const element = document.querySelector('.foo'); // `Element | null`
-if (element && elIs(element, 'SECTION')) {
-  // `element` now has type `Element & { tagName: 'SECTION' }`
+    Also, although `Element` will work as a type for the first parameter,
+    it's better to narrow it first to `HTMLElement`, `MathMLElement`, or `SVGElement`.
+
+    See Usage Notes below.
+  */
 }
 ```
 
 ## Usage Notes
 
-The `elIs()` function takes a DOM element (`el`) and a string-literal (`tagName`) and returns the `boolean` result of a simple `el.tagName === tagName` check, but with some TypeScript niceties:
+The `elIs()` function takes a DOM element (`el`) and a string-literal (`tagName`) and returns the `boolean` result of a simple `el.tagName === tagName` check, but with some TypeScript niceties described below.
 
-- In the `true` case, the type-predicate narrows the type of `el` by intersecting its input-type with `{ tagName: T }`, where `T` is the string-literal type provided as the `tagName` argument.
+But first, a quick warning: _**you probably should only use this function if the element-type you're checking against doesn't have its own dedicated interface!**_ For example, if you want to check whether `el` is a link, I can't think of any reason not to just do `if (el instanceof HTMLAnchorElement)`, so that the type-narrowing gives you all the properties and methods that come with the more specific interface (like `HTMLAnchorElement.href`). The `elIs()` function is really for checking against element-types that _don't_ have their own interfaces, like `<section>`.
 
-- To prevent you from making typos, the `tagName` parameter is restricted to valid tag-name values for built-in elements of the top-level `Element`-subtype that `el` is an instance of (if applicable). For example, if `el` is an instance of `HTMLElement` (something like an `HTMLParagraphElement` would qualify), then `tagName` must be a string literal that's the value of the `tagName` property of a built-in HTML element. If `el` is only known to be an `Element`, then `tagName` is still restricted, but less so: it must be a string literal that's the value of the `tagName` property of a built-in HTML element, SVG element, or MathML element. (It's best if `el` is more specific than `Element`, though, so that you don't have to worry about confusing uppercase HTML tag-names like `'A'` with lowercase SVG or MathML tag-names like `'a'`.)
+With that out of the way, here are the TypeScript niceties you get with the `elIs()` function:
 
-Note that because of the `tagName` restrictions, this function is only useful in TypeScript for built-in HTML elements (including deprecated ones), SVG elements, and MathML elements. It's not for use with custom elements.
+- In the `true` case, the function's type-predicate narrows the type of `el` by intersecting its input-type with `{ tagName: T }`, where `T` is the string-literal type provided as the `tagName` argument.
+- To prevent you from making typos (and to enable autocomplete), the `tagName` parameter is restricted to valid tag-name values for built-in elements of the `Element`-subtype that `el` is an instance of (if applicable). The supported `Element`-subtypes are `HTMLElement`, `SVGElement`, and `MathMLElement`. For example, if `el` is an instance of `HTMLElement`, then `tagName` must be a string literal that's the value of the `tagName` property of a built-in HTML element. If `el` is an `Element` but not an instance of one of those subtypes, then `tagName` is still restricted, but less so: it must be a string literal that's the value of the `tagName` property of a built-in HTML element, SVG element, or MathML element. (It's best if `el` is more specific than `Element`, though, so that you don't have to worry about confusing uppercase HTML tag-names like `'A'` with lowercase SVG or MathML tag-names like `'a'`.)
 
-### Why?
+If you don't use `elIs()`, you can just do something like `if (el.matches('section'))` or `if (el.tagName === 'section')` instead. But then you don't get the type-narrowing, the autocomplete, or the typo-prevention, and you'll probably make the mistake I just made in the previous sentence (should be `if (el.tagName === 'SECTION')`).
 
-You might be wondering: how is this useful at all? Why bother with this when a simple check like `if (el is instanceof HTMLDivElement)` is already available? And the `instanceof` check is clearly superior, since the narrowed type it produces comes with the more specific interface's properties and methods (like `HTMLAnchorElement.href`).
+A few more notes:
 
-The answer is that many element-types don't actually have their own dedicated interface! For example, there's no `HTMLSectionElement` interface; a `<section>` tag is just an `HTMLElement`-instance in the DOM. This function is primarily useful for precisely these elements, where `instanceof` isn't an option.
-
-To be sure, even in a case like `<section>`, you could still just do `if (el.matches('section'))` or `if (el.tagName === 'section')`. But then you don't get the benefits of type-narrowing, auto-completion, and typo-prevention. To that end: did you notice the typo in the `el.tagName` check two sentences ago? Should have been `if (el.tagName === 'SECTION')`!
+- Because of the aforementioned `tagName` restrictions, this function won't work with custom elements.
+- Although `SVGElement` is a supported `Element`-subtype here, it's worth noting that, at the time of writing, every kind of SVG element has its own dedicated interface (like `SVGPathElement`), so you probably want to reach for `instanceof` when checking against it.
+- Deprecated HTML elements are supported (e.g., if `el` is an `HTMLElement` or `Element`, then `tagName` can be `'MARQUEE'`).
 
 ## API
 

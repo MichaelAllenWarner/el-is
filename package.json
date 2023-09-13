@@ -1,6 +1,6 @@
 {
   "name": "el-is",
-  "version": "0.0.0-development",
+  "version": "1.0.0",
   "description": "A tiny TypeScript type guard (predicate-function) for narrowing a DOM element by tag-name.",
   "main": "./lib/index.js",
   "files": [
