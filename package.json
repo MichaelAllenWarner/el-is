@@ -1,5 +1,5 @@
 {
-  "name": "@michaelallenwarner/el-is",
+  "name": "el-is",
   "version": "1.0.0",
   "description": "A tiny TypeScript type guard (predicate-function) for narrowing a DOM element by tag-name.",
   "main": "./lib/index.js",
@@ -26,9 +26,6 @@
     "name": "Michael Allen Warner",
     "email": "MichaelAllenWarner@users.noreply.github.com",
     "url": "https://github.com/MichaelAllenWarner"
-  },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com/"
   },
   "engines": {
     "node": ">=12.2"
