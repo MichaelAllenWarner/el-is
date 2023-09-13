@@ -1,117 +1,115 @@
-# typescript-npm-package-template
+# el-is
 
-> Template to kickstart creating a Node.js module using TypeScript and VSCode
-
-Inspired by [node-module-boilerplate](https://github.com/sindresorhus/node-module-boilerplate)
-
-## Features
-
-- [Semantic Release](https://github.com/semantic-release/semantic-release)
-- [Issue Templates](https://github.com/ryansonshine/typescript-npm-package-template/tree/main/.github/ISSUE_TEMPLATE)
-- [GitHub Actions](https://github.com/ryansonshine/typescript-npm-package-template/tree/main/.github/workflows)
-- [Codecov](https://about.codecov.io/)
-- [VSCode Launch Configurations](https://github.com/ryansonshine/typescript-npm-package-template/blob/main/.vscode/launch.json)
-- [TypeScript](https://www.typescriptlang.org/)
-- [Husky](https://github.com/typicode/husky)
-- [Lint Staged](https://github.com/okonet/lint-staged)
-- [Commitizen](https://github.com/search?q=commitizen)
-- [Jest](https://jestjs.io/)
-- [ESLint](https://eslint.org/)
-- [Prettier](https://prettier.io/)
-
-## Getting started
-
-### Set up your repository
-
-**Click the "Use this template" button.**
-
-Alternatively, create a new directory and then run:
-
-```bash
-curl -fsSL https://github.com/ryansonshine/typescript-npm-package-template/archive/main.tar.gz | tar -xz --strip-components=1
-```
-
-Replace `FULL_NAME`, `GITHUB_USER`, and `REPO_NAME` in the script below with your own details to personalize your new package:
-
-```bash
-FULL_NAME="John Smith"
-GITHUB_USER="johnsmith"
-REPO_NAME="my-cool-package"
-sed -i.mybak "s/\([\/\"]\)(ryansonshine)/$GITHUB_USER/g; s/typescript-npm-package-template\|my-package-name/$REPO_NAME/g; s/Ryan Sonshine/$FULL_NAME/g" package.json package-lock.json README.md
-rm *.mybak
-```
-
-### Add NPM Token
-
-Add your npm token to your GitHub repository secrets as `NPM_TOKEN`.
-
-### Add Codecov integration
-
-Enable the Codecov GitHub App [here](https://github.com/apps/codecov).
-
-**Remove everything from here and above**
-
----
-
-# my-package-name
-
-[![npm package][npm-img]][npm-url]
-[![Build Status][build-img]][build-url]
-[![Downloads][downloads-img]][downloads-url]
-[![Issues][issues-img]][issues-url]
-[![Code Coverage][codecov-img]][codecov-url]
-[![Commitizen Friendly][commitizen-img]][commitizen-url]
-[![Semantic Release][semantic-release-img]][semantic-release-url]
-
-> My awesome module
+- [el-is](#el-is)
+  - [Install](#install)
+  - [Usage](#usage)
+  - [Usage Notes](#usage-notes)
+    - [Why?](#why)
+  - [API](#api)
+    - [elIs](#elis)
+      - [Type parameters](#type-parameters)
+      - [Parameters](#parameters)
+      - [Returns](#returns)
 
 ## Install
 
 ```bash
-npm install my-package-name
+npm install el-is
 ```
 
 ## Usage
 
 ```ts
-import { myPackage } from 'my-package-name';
+import { elIs } from 'el-is';
 
-myPackage('hello');
-//=> 'hello from my package'
+const htmlElement = document.querySelector('section'); // `HTMLElement | null`
+if (htmlElement && elIs(htmlElement, 'SECTION')) {
+  // `htmlElement` now has type `HTMLElement & { tagName: 'SECTION' }`
+}
+
+const mathMlElement = document.querySelector('mrow'); // `MathMLElement | null`
+if (mathMlElement && elIs(mathMlElement, 'mrow')) {
+  // `mathMlElement` now has type `MathMLElement & { tagName: 'mrow' }`
+}
+
+const svgElement = document.querySelector('path'); // `SVGElement | null`
+if (svgElement && elIs(svgElement, 'path')) {
+  // `svgElement` now has type `SVGElement & { tagName: 'path' }`
+}
+
+const element = document.querySelector('.foo'); // `Element | null`
+if (element && elIs(element, 'SECTION')) {
+  // `element` now has type `Element & { tagName: 'SECTION' }`
+}
 ```
+
+## Usage Notes
+
+The `elIs()` function takes a DOM element (`el`) and a string-literal (`tagName`) and returns the `boolean` result of a simple `el.tagName === tagName` check, but with some TypeScript niceties:
+
+- In the `true` case, the type-predicate narrows the type of `el` by intersecting its input-type with `{ tagName: T }`, where `T` is the string-literal type provided as the `tagName` argument.
+
+- To prevent you from making typos, the `tagName` parameter is restricted to valid tag-name values for built-in elements of the top-level `Element`-subtype that `el` is an instance of (if applicable). For example, if `el` is an instance of `HTMLElement` (something like an `HTMLParagraphElement` would qualify), then `tagName` must be a string literal that's the value of the `tagName` property of a built-in HTML element. If `el` is only known to be an `Element`, then `tagName` is still restricted, but less so: it must be a string literal that's the value of the `tagName` property of a built-in HTML element, SVG element, or MathML element. (It's best if `el` is more specific than `Element`, though, so that you don't have to worry about confusing uppercase HTML tag-names like `'A'` with lowercase SVG or MathML tag-names like `'a'`.)
+
+Note that because of the `tagName` restrictions, this function is only useful in TypeScript for built-in HTML elements (including deprecated ones), SVG elements, and MathML elements. It's not for use with custom elements.
+
+### Why?
+
+You might be wondering: how is this useful at all? Why bother with this when a simple check like `if (el is instanceof HTMLDivElement)` is already available? And the `instanceof` check is clearly superior, since the narrowed type it produces comes with the more specific interface's properties and methods (like `HTMLAnchorElement.href`).
+
+The answer is that many element-types don't actually have their own dedicated interface! For example, there's no `HTMLSectionElement` interface; a `<section>` tag is just an `HTMLElement`-instance in the DOM. This function is primarily useful for precisely these elements, where `instanceof` isn't an option.
+
+To be sure, even in a case like `<section>`, you could still just do `if (el.matches('section'))` or `if (el.tagName === 'section')`. But then you don't get the benefits of type-narrowing, auto-completion, and typo-prevention. To that end: did you notice the typo in the `el.tagName` check two sentences ago? Should have been `if (el.tagName === 'SECTION')`!
 
 ## API
 
-### myPackage(input, options?)
+### elIs
 
-#### input
+▸ **elIs**<`E`, `T`\>(`el`, `tagName`): `el` is `E` & { `tagName`: `T` }
 
-Type: `string`
+#### Type parameters
 
-Lorem ipsum.
+| Name | Type |
+| :------ | :------ |
+| `E` | extends `HTMLElement` \| `Element` \| `SVGElement` \| `MathMLElement` |
+| `T` | extends `Uppercase<keyof HTMLElementTagNameMap \| keyof HTMLElementDeprecatedTagNameMap>` \| keyof `SVGElementTagNameMap` \| keyof `MathMLElementTagNameMap` |
 
-#### options
+#### Parameters
 
-Type: `object`
+| Name | Type |
+| :------ | :------ |
+| `el` | `E` |
+| `tagName` | `T` |
 
-##### postfix
+#### Returns
 
-Type: `string`
-Default: `rainbows`
+`el` is `E` & { `tagName`: `T` }
 
-Lorem ipsum.
-
-[build-img]:https://github.com/ryansonshine/typescript-npm-package-template/actions/workflows/release.yml/badge.svg
-[build-url]:https://github.com/ryansonshine/typescript-npm-package-template/actions/workflows/release.yml
+<!-- markdownlint-disable-next-line MD053 -->
+[build-img]:https://github.com/MichaelAllenWarner/el-is/actions/workflows/release.yml/badge.svg
+<!-- markdownlint-disable-next-line MD053 -->
+[build-url]:https://github.com/MichaelAllenWarner/el-is/actions/workflows/release.yml
+<!-- markdownlint-disable-next-line MD053 -->
 [downloads-img]:https://img.shields.io/npm/dt/typescript-npm-package-template
+<!-- markdownlint-disable-next-line MD053 -->
 [downloads-url]:https://www.npmtrends.com/typescript-npm-package-template
+<!-- markdownlint-disable-next-line MD053 -->
 [npm-img]:https://img.shields.io/npm/v/typescript-npm-package-template
+<!-- markdownlint-disable-next-line MD053 -->
 [npm-url]:https://www.npmjs.com/package/typescript-npm-package-template
-[issues-img]:https://img.shields.io/github/issues/ryansonshine/typescript-npm-package-template
-[issues-url]:https://github.com/ryansonshine/typescript-npm-package-template/issues
-[codecov-img]:https://codecov.io/gh/ryansonshine/typescript-npm-package-template/branch/main/graph/badge.svg
-[codecov-url]:https://codecov.io/gh/ryansonshine/typescript-npm-package-template
+<!-- markdownlint-disable-next-line MD053 -->
+[issues-img]:https://img.shields.io/github/issues/MichaelAllenWarner/el-is
+<!-- markdownlint-disable-next-line MD053 -->
+[issues-url]:https://github.com/MichaelAllenWarner/el-is/issues
+<!-- markdownlint-disable-next-line MD053 -->
+[codecov-img]:https://codecov.io/gh/MichaelAllenWarner/el-is/branch/main/graph/badge.svg
+<!-- markdownlint-disable-next-line MD053 -->
+[codecov-url]:https://codecov.io/gh/MichaelAllenWarner/el-is
+<!-- markdownlint-disable-next-line MD053 -->
 [semantic-release-img]:https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg
+<!-- markdownlint-disable-next-line MD053 -->
 [semantic-release-url]:https://github.com/semantic-release/semantic-release
+<!-- markdownlint-disable-next-line MD053 -->
 [commitizen-img]:https://img.shields.io/badge/commitizen-friendly-brightgreen.svg
+<!-- markdownlint-disable-next-line MD053 -->
 [commitizen-url]:http://commitizen.github.io/cz-cli/
