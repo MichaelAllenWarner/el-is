@@ -1,6 +1,6 @@
 {
   "name": "@michaelallenwarner/el-is",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A tiny TypeScript type guard (predicate-function) for narrowing a DOM element by tag-name.",
   "main": "./lib/index.js",
   "files": [
