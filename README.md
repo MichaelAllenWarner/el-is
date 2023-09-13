@@ -13,7 +13,7 @@
 ## Install
 
 ```bash
-npm install el-is
+npm install @michaelallenwarner/el-is
 ```
 
 ## Usage
