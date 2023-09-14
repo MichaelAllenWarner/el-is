@@ -248,44 +248,51 @@ const math: { [K in keyof MathMLElementTagNameMap]: K } = {
 };
 
 describe('index', () => {
-  describe('elIs', () => {
-    it('should return `true` for each type of `HTMLElement` paired with its correct `tagName` value', () => {
-      for (const key in html) {
-        const value =
-          html[
-            key as
-              | keyof HTMLElementTagNameMap
-              | keyof HTMLElementDeprecatedTagNameMap
-          ];
-        const el = document.createElement(key);
-        const result = elIs(el, value);
+  describe('elIs(el, tagName)', () => {
+    for (const key in html) {
+      const tagName =
+        html[
+          key as
+            | keyof HTMLElementTagNameMap
+            | keyof HTMLElementDeprecatedTagNameMap
+        ];
+      const el = document.createElement(key);
+      const result = elIs(el, tagName);
+      it(`should return \`true\` when \`el\` is \`<${key}>\` (an \`HTMLElement\`) and \`tagName\` is \`'${tagName}'\``, () => {
         expect(result).toBe(true);
-      }
-    });
+      });
+    }
 
-    it('should return `true` for each type of `SVGElement` paired with its correct `tagName` value', () => {
-      for (const key in svg) {
-        const value = svg[key as keyof SVGElementTagNameMap];
-        const el = document.createElementNS('http://www.w3.org/2000/svg', key);
-        const result = elIs(el, value);
+    for (const key in svg) {
+      const tagName = svg[key as keyof SVGElementTagNameMap];
+      const el = document.createElementNS('http://www.w3.org/2000/svg', key);
+      const result = elIs(el, tagName);
+      it(`should return \`true\` when \`el\` is \`<${key}>\` (an \`SVGElement\`) and \`tagName\` is \`'${tagName}'\``, () => {
         expect(result).toBe(true);
-      }
-    });
+      });
+    }
 
-    it('should return `true` for each type of `MathMLElement` paired with its correct `tagName` value', () => {
-      for (const key in math) {
-        const value = math[key as keyof MathMLElementTagNameMap];
-        const el = document.createElementNS(
-          'http://www.w3.org/1998/Math/MathML',
-          key
-        );
-        const result = elIs(el, value);
+    for (const key in math) {
+      const tagName = math[key as keyof MathMLElementTagNameMap];
+      const el = document.createElementNS(
+        'http://www.w3.org/1998/Math/MathML',
+        key
+      );
+      const result = elIs(el, tagName);
+      it(`should return \`true\` when \`el\` is \`<${key}>\` (a \`MathMLElement\`) and \`tagName\` is \`'${tagName}'\``, () => {
         expect(result).toBe(true);
-      }
-    });
+      });
+    }
 
     it('should return `false` when `el.tagName !== tagName`', () => {
       const result = elIs(document.createElement('div'), 'SPAN');
+      expect(result).toBe(false);
+    });
+
+    it('should return `false` when `el === null`', () => {
+      const nullEl = document.querySelector('div');
+      expect(nullEl).toBe(null);
+      const result = elIs(nullEl, 'DIV');
       expect(result).toBe(false);
     });
   });
